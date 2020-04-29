@@ -10,11 +10,37 @@
 #                                                                              #
 # **************************************************************************** #
 
-# Base image
+# *** BASE IMAGE QUERY ******************************************************* #
 
 FROM debian:buster
 
-# System update
+# *** SYSTEM UPDATE ********************************************************** #
 
 RUN apt-get -y update
 RUN apt-get -y upgrade
+
+# *** DEPENDENCIES INSTALLATION ********************************************** #
+
+# nginx:
+RUN apt-get install -y nginx
+
+# mysql
+RUN apt-get install -y mysql-server
+
+# php:
+RUN apt-get install -y php
+
+
+# *** NGINX SETUP ************************************************************ #
+
+# nginx config file replacement
+RUN rm -v /etc/nginx/nginx.conf
+ADD srcs/nginx.conf /etc/nginx/
+
+# nginx service startup
+CMD service nginx start
+
+# *** GLOBAL SETUP *********************************************************** #
+
+# port exposition
+EXPOSE 80
