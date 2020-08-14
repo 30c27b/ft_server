@@ -3,7 +3,7 @@
 #                                                         :::      ::::::::    #
 #    Dockerfile                                         :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ancoulon <ncoulon@student.s19.be>         +#+  +:+       +#+         #
+#    By: ancoulon <ancoulon@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/03/26 15:51:16 by ancoulon          #+#    #+#              #
 #    Updated: 2020/03/26 15:52:16 by ancoulon         ###   ########.fr        #
@@ -14,10 +14,17 @@
 
 FROM debian:buster
 
+
+# *** METADATA *************************************************************** #
+
+LABEL maintainer="ancoulon@student.s19.be"
+
+
 # *** SYSTEM UPDATE ********************************************************** #
 
-RUN apt-get -y update
-RUN apt-get -y upgrade
+RUN apt-get update -y
+RUN apt-get upgrade -y
+
 
 # *** DEPENDENCIES INSTALLATION ********************************************** #
 
@@ -25,22 +32,47 @@ RUN apt-get -y upgrade
 RUN apt-get install -y nginx
 
 # mysql
-RUN apt-get install -y mysql-server
+RUN apt-get install -y mariadb-server
 
 # php:
-RUN apt-get install -y php
-
+RUN apt-get install -y php7.3-fpm php7.3-mysql \
+php-common php7.3-cli php7.3-common php7.3-json php7.3-opcache php7.3-readline
 
 # *** NGINX SETUP ************************************************************ #
 
-# nginx config file replacement
-RUN rm -v /etc/nginx/nginx.conf
-ADD srcs/nginx.conf /etc/nginx/
+ADD srcs/wordpress.conf /etc/nginx/sites-available/wordpress.conf
+RUN ln -s /etc/nginx/sites-available/wordpress.conf /etc/nginx/sites-enabled/
 
-# nginx service startup
-CMD service nginx start
+
+# *** WEBSERVERS SETUP ******************************************************* #
+
+# wordpress
+ADD srcs/wordpress /var/www/wordpress
+RUN chown -R www-data:www-data /var/www/wordpress
+
+# # phpmyadmin
+# ADD srcs/phpmyadmin /var/www/phpmyadmin
+# RUN chown -R www-data:www-data /var/www/phpmyadmin
+
+# *** SERVICES *************************************************************** #
+
+# nginx
+RUN service nginx start
+
+# mysql
+RUN service mysql start
+
+# php
+RUN service php7.3-fpm start
+
 
 # *** GLOBAL SETUP *********************************************************** #
 
 # port exposition
 EXPOSE 80
+
+# adding initialisation script
+ADD srcs/init.sh init.sh
+
+# running init script
+CMD /bin/bash init.sh
