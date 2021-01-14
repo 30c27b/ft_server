@@ -6,7 +6,7 @@
 #    By: ancoulon <ancoulon@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/03/26 15:51:16 by ancoulon          #+#    #+#              #
-#    Updated: 2021/01/14 09:39:07 by ancoulon         ###   ########.fr        #
+#    Updated: 2021/01/14 10:04:59 by ancoulon         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -45,4 +45,4 @@ EXPOSE 80
 EXPOSE 443
 
 ADD srcs/init.sh /root/init.sh
-CMD ["/bin/bash", "/root/init.sh"]
+CMD ["/bin/sh", "/root/init.sh"]
